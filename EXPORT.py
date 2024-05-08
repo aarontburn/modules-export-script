@@ -42,6 +42,10 @@ def locateModule() -> str:
 '''The name of the directory containing the module to export.'''
 FOLDER_NAME: str = locateModule()
 
+if FOLDER_NAME == None:
+    raise SystemExit("Could not locate 'ref.DAT'. Ensure your module folder contains it.")
+
+
 '''The path of the output directory in the output folder.'''
 OUTPUT_FOLDER_PATH: str = PWD + "/output/" + FOLDER_NAME + "/"
 
