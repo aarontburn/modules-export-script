@@ -13,12 +13,13 @@ Change this to the name of folder containing your module
 """
 FOLDER_NAME: str = 'sample_module' # Change this to the name of folder containing your module
 
+# This ugly line is to get to the root directory of a project from node_modules folder.
 PWD: str = str(pathlib.Path(__file__).parent.parent.parent.resolve())
 OUTPUT_FOLDER_PATH: str = PWD + "/output/" + FOLDER_NAME + "/"
 NODE_MODULES_PATH: str = PWD + "/node_modules"
 
-def main():
-
+def main() -> None:
+    shutil.rmtree(OUTPUT_FOLDER_PATH, ignore_errors=True)
     
     createDirectories()
     copyFiles()
@@ -28,22 +29,15 @@ def main():
 
 
 def createDirectories() -> None:
-    def mkdir(directoryName: str) -> bool:
+    def mkdir(directoryName: str) -> None:
         try:
             os.makedirs(directoryName)
             print("Creating folder: " + directoryName)
-            return True
         except FileExistsError:
             print("Removing existing directory: " + directoryName)
-            return False
         
     print("\n\tCREATING FOLDERS\n")
-    if not mkdir(OUTPUT_FOLDER_PATH):
-        shutil.rmtree(OUTPUT_FOLDER_PATH)
-        time.sleep(0.1)
-        mkdir(OUTPUT_FOLDER_PATH)
-    
-    
+    mkdir(OUTPUT_FOLDER_PATH)
     mkdir(OUTPUT_FOLDER_PATH + "module_builder")
     mkdir(OUTPUT_FOLDER_PATH + "node_modules")
 
@@ -88,7 +82,7 @@ def checkAndCopyDependencies() -> None:
         except ValueError:
             print(dependency_name + " was not found in node_modules. Skipping...")
             continue
-        dependency_path = NODE_MODULES_PATH + "/" + dependency_name
+        dependency_path: str = NODE_MODULES_PATH + "/" + dependency_name
         try:
             print("Copying '" + dependency_path + "' to '" + OUTPUT_FOLDER_PATH + "node_modules/'")
             shutil.copytree(dependency_path, OUTPUT_FOLDER_PATH + "node_modules/" + dependency_name)
@@ -98,22 +92,6 @@ def checkAndCopyDependencies() -> None:
             time.sleep(0.1) # Add small delay
             shutil.copytree(dependency_path, OUTPUT_FOLDER_PATH + "node_modules/" + dependency_name)  
         
-
-# def make_archive(source, destination):
-#     base_name = '.'.join(destination.split('.')[:-1])
-#     format = destination.split('.')[-1]
-#     root_dir = os.path.dirname(source)
-#     base_dir = os.path.basename(source.strip(os.sep))
-#     shutil.make_archive(base_name, format, root_dir, base_dir)      
-    
-      
-# # Zip output
-# make_archive(OUTPUT_FOLDER_PATH, OUTPUT_FOLDER_PATH[:-1] + ".zip")       
-
-# # Delete folder
-# shutil.rmtree(OUTPUT_FOLDER_PATH)
-    
-
     
 if __name__ == "__main__":
     main()
