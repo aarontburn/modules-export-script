@@ -116,6 +116,9 @@ def checkAndCopyDependencies() -> None:
 
     node_modules: list[str] = os.listdir(NODE_MODULES_PATH)
     for dependency_name in dependencies.keys():
+        if dependency_name == 'modules-export-script':
+            continue
+        
         # version = dependencies[dependency]
         try:
             node_modules.index(dependency_name)
