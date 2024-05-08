@@ -110,7 +110,7 @@ def checkAndCopyDependencies() -> None:
     package_json: any = json.loads(file_text)
     dependencies: any = package_json['dependencies']
 
-    if (len(dependencies.keys()) > 0):
+    if (len(dependencies.keys()) > 1): # Ignoring this file
         print("\n\tBUNDLING DEPENDENCIES\n")
 
 
