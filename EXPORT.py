@@ -1,24 +1,56 @@
+'''
+Author: 
+    aarontburn (https://github.com/aarontburn)
+Title:
+    Module Export Script
+Purpose:
+    Properly export developed module to use with parent application
+        (https://github.com/aarontburn/modules)
+
+Repository: 
+    https://github.com/aarontburn/modules-export-script
+    
+Usage: 
+    'npm run export', or 'python node_modules/modules-export-script/EXPORT.py'
+    
+Expected Result: 
+    In the root directory, a directory 'output/' will be created containing required files for the module.
+'''
+
 import os
 import pathlib
 import shutil
 import json
 import time
 
-# Author: aarontburn
-# Module Exporter
-
-"""
-Usage Information:
-Change this to the name of folder containing your module
-"""
-FOLDER_NAME: str = 'sample_module' # Change this to the name of folder containing your module
-
-# This ugly line is to get to the root directory of a project from node_modules folder.
+'''The path of the root directory of this module.'''
 PWD: str = str(pathlib.Path(__file__).parent.parent.parent.resolve())
+
+def locateModule() -> str:
+    '''
+    Scans "src" folder for a directory containing "ref.DAT", which should
+    be located in the module directory.
+    
+    Returns the name of the directory.
+    '''
+    src_path: str = PWD + "/src/"
+    for file in os.listdir(src_path):
+        file_path = src_path + file
+        if os.path.isdir(file_path) and os.listdir(file_path).count("ref.DAT") > 0:
+            return file
+
+'''The name of the directory containing the module to export.'''
+FOLDER_NAME: str = locateModule()
+
+'''The path of the output directory in the output folder.'''
 OUTPUT_FOLDER_PATH: str = PWD + "/output/" + FOLDER_NAME + "/"
+
+'''The path to the node_modules directory in the output folder.'''
 NODE_MODULES_PATH: str = PWD + "/node_modules"
 
+
 def main() -> None:
+    ''' Entry point. '''
     shutil.rmtree(OUTPUT_FOLDER_PATH, ignore_errors=True)
     
     createDirectories()
@@ -29,7 +61,10 @@ def main() -> None:
 
 
 def createDirectories() -> None:
+    '''Creates folders required for the export.'''
+    
     def mkdir(directoryName: str) -> None:
+        '''Helper function to create directories.'''
         try:
             os.makedirs(directoryName)
             print("Creating folder: " + directoryName)
@@ -43,10 +78,10 @@ def createDirectories() -> None:
 
 
 def copyFiles() -> None:
-    # Step 2: Copy all files from module folder into output folder
+    '''Copies files into the output folder.'''
+    
     print("\n\tCOPYING FILES\n")
-    # Path of current file
-    path: str = PWD + "/src/" + FOLDER_NAME+ "/"
+    path: str = PWD + "/src/" + FOLDER_NAME + "/"
 
     for file in os.listdir(path):
         full_file_path = path + file
@@ -58,7 +93,8 @@ def copyFiles() -> None:
 
 
 def checkAndCopyDependencies() -> None:
-    # Step 3: Parse package.json for dependencies
+    '''Checks the dependencies and bundles them with output folder.'''
+    
     file_text: str = ''
     with open("package.json", "r") as file:
         file_text = file.read()
@@ -68,7 +104,7 @@ def checkAndCopyDependencies() -> None:
         return
 
     package_json: any = json.loads(file_text)
-    dependencies = package_json['dependencies']
+    dependencies: any = package_json['dependencies']
 
     if (len(dependencies.keys()) > 0):
         print("\n\tBUNDLING DEPENDENCIES\n")
