@@ -87,7 +87,7 @@ def copyFiles() -> None:
         full_file_path = path + file
         output_file_path = OUTPUT_FOLDER_PATH + file
         
-        if (os.path.isfile(full_file_path)):
+        if (os.path.isfile(full_file_path) and file != "ref.DAT"):
             print("Copying '" + full_file_path + "' to output folder ('" + output_file_path + "')")
             shutil.copyfile(full_file_path, output_file_path)
 
