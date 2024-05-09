@@ -23,12 +23,16 @@ import shutil
 import json
 import time
 
+
+'''File name of the info file for the module.'''
+MODULE_INFO_FILE = "moduleinfo.json"
+
 '''The path of the root directory of this module.'''
 PWD: str = str(pathlib.Path(__file__).parent.parent.parent.resolve())
 
 def locateModule() -> str:
     '''
-    Scans "src" folder for a directory containing "ref.DAT", which should
+    Scans "src" folder for a directory containing "moduleinfo.json", which should
     be located in the module directory.
     
     Returns the name of the directory.
@@ -36,14 +40,14 @@ def locateModule() -> str:
     src_path: str = PWD + "/src/"
     for file in os.listdir(src_path):
         file_path = src_path + file
-        if os.path.isdir(file_path) and os.listdir(file_path).count("ref.DAT") > 0:
+        if os.path.isdir(file_path) and os.listdir(file_path).count(MODULE_INFO_FILE) > 0:
             return file
 
 '''The name of the directory containing the module to export.'''
 FOLDER_NAME: str = locateModule()
 
 if FOLDER_NAME == None:
-    raise SystemExit("Could not locate 'ref.DAT'. Ensure your module folder contains it.")
+    raise SystemExit("Could not locate '" + MODULE_INFO_FILE + "'. Ensure your module folder contains it.")
 
 
 '''The path of the output directory in the output folder.'''
@@ -87,11 +91,11 @@ def copyFiles() -> None:
     print("\n\tCOPYING FILES\n")
     path: str = PWD + "/src/" + FOLDER_NAME + "/"
 
-    for file in os.listdir(path):
-        full_file_path = path + file
-        output_file_path = OUTPUT_FOLDER_PATH + file
+    for filename in os.listdir(path):
+        full_file_path = path + filename
+        output_file_path = OUTPUT_FOLDER_PATH + filename
         
-        if (os.path.isfile(full_file_path) and file != "ref.DAT"):
+        if (os.path.isfile(full_file_path)):
             print("Copying '" + full_file_path + "' to output folder ('" + output_file_path + "')")
             shutil.copyfile(full_file_path, output_file_path)
 
