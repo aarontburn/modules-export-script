@@ -60,12 +60,22 @@ NODE_MODULES_PATH: str = PWD + "/node_modules"
 def main() -> None:
     ''' Entry point. '''
     shutil.rmtree(OUTPUT_FOLDER_PATH, ignore_errors=True)
-    
+    modifyModuleInfoJSON()
     createDirectories()
     copyFiles()
     checkAndCopyDependencies()
     print("\n\tFINISHED BUNDLING MODULE\n")
     
+    
+def modifyModuleInfoJSON() -> None:
+    '''Increments build version in moduleinfo.json'''
+    jsonPath = PWD + "/src/" + FOLDER_NAME + "/" + MODULE_INFO_FILE
+    with open(jsonPath, "r+") as file:
+        m = json.load(file)
+        m["build_version"] += 1
+        file.seek(0)
+        file.write(str(m).replace("'", '"'))
+        file.truncate()
 
 
 def createDirectories() -> None:
