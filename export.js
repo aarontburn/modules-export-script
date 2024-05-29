@@ -92,6 +92,8 @@ function copyFiles() {
     }
 }
 
+
+
 function checkAndCopyDependencies() {
     const json = JSON.parse(fs.readFileSync(PWD + "/package.json"));
 
@@ -101,6 +103,9 @@ function checkAndCopyDependencies() {
     if (dependencyNames.length > 1) {
         console.log("\n\tBUNDLING DEPENDENCIES\n");
     }
+
+
+    const depSet = new Set()
 
     const nodeModules = fs.readdirSync(NODE_MODULES_PATH);
 
@@ -113,12 +118,39 @@ function checkAndCopyDependencies() {
             console.log(dependencyName + " was not found in 'node_modules'. Skipping...")
             continue;
         }
-        const dependencyPath = path.join(NODE_MODULES_PATH, dependencyName);
-        console.log("Copying '" + dependencyPath + "' to '" + OUTPUT_FOLDER_PATH + "node_modules/'")
-        fs.cpSync(dependencyPath, path.join(OUTPUT_FOLDER_PATH, "node_modules/" + dependencyName), { recursive: true });
 
+        depSet.add(dependencyName)
+        checkDependencysDependencies(dependencyName, depSet)
     }
 
+    console.log(depSet)
+
+
+    depSet.forEach(depName => {
+        const dependencyPath = path.join(NODE_MODULES_PATH, depName);
+        console.log("Copying '" + dependencyPath + "' to '" + OUTPUT_FOLDER_PATH + "node_modules/'")
+        fs.cpSync(dependencyPath, path.join(OUTPUT_FOLDER_PATH, "node_modules/" + depName), { recursive: true });
+    })
 }
+
+
+function checkDependencysDependencies(depName, depSet) {
+    const depDir = path.join(NODE_MODULES_PATH, depName);
+    const depJson = path.join(depDir, "package.json");
+
+    const json = JSON.parse(fs.readFileSync(depJson));
+    const dependencies = json["dependencies"];
+
+    if (dependencies !== undefined) {
+
+        Object.keys(dependencies).forEach(name => {
+            depSet.add(name);
+            checkDependencysDependencies(name, depSet)
+        })
+    }
+}
+
+
+
 
 main();
