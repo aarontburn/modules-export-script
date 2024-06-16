@@ -23,6 +23,7 @@ Expected Result:
 
 const path = require("path");
 const fs = require("fs");
+const dialogNode = require('dialog-node')
 
 // File name of the info file for the module.
 const MODULE_INFO_FILE = "moduleinfo.json";
@@ -49,9 +50,19 @@ const OUTPUT_FOLDER_PATH = PWD + "/output/" + FOLDER_NAME + "/";
 // The path to the node_modules directory in the output folder.
 const NODE_MODULES_PATH = PWD + "/node_modules";
 
+let chosenFolder;
 
-function main() {
-    fs.rmSync(OUTPUT_FOLDER_PATH, { recursive: true, force: true });
+const getOutputFolder = () => chosenFolder === undefined ? OUTPUT_FOLDER_PATH : chosenFolder;
+
+async function main() {
+
+    const outputPath = await getDirectory();
+    console.log(outputPath)
+    if (outputPath !== undefined) {
+        chosenFolder = outputPath;
+    }
+
+    fs.rmSync(getOutputFolder(), { recursive: true, force: true });
     modifyModuleInfoJSON();
     createDirectories();
     copyFiles();
@@ -59,6 +70,19 @@ function main() {
 
     console.log("\n\tFINISHING BUNDLING MODULE");
 }
+
+async function getDirectory() {
+    const promise = new Promise((resolve, _) => {
+        dialogNode.fileselect('asd', 'Choose a folder to save your module in.', 0, (_, directory, __ ) => {
+            if (directory === '') {
+                resolve(undefined)
+            }
+            resolve(directory)
+        });
+    })
+    return promise;
+
+} 
 
 function modifyModuleInfoJSON() {
     const jsonPath = PWD + "/src/" + FOLDER_NAME + "/" + MODULE_INFO_FILE;
@@ -73,9 +97,9 @@ function createDirectories() {
     }
 
     console.log("\n\tCREATING FOLDERS\n");
-    mkdir(OUTPUT_FOLDER_PATH);
-    mkdir(OUTPUT_FOLDER_PATH + "module_builder");
-    mkdir(OUTPUT_FOLDER_PATH + "node_modules");
+    mkdir(getOutputFolder());
+    mkdir(getOutputFolder() + "module_builder");
+    mkdir(getOutputFolder() + "node_modules");
 }
 
 function copyFiles() {
@@ -87,8 +111,8 @@ function copyFiles() {
             continue;
         }
 
-        console.log(`Copying '${path.join(file.path, file.name)}' to output folder (${path.join(OUTPUT_FOLDER_PATH, file.name)})`);
-        fs.cpSync(path.join(file.path, file.name), path.join(OUTPUT_FOLDER_PATH, file.name), { recursive: true });
+        console.log(`Copying '${path.join(file.path, file.name)}' to output folder (${path.join(getOutputFolder(), file.name)})`);
+        fs.cpSync(path.join(file.path, file.name), path.join(getOutputFolder(), file.name), { recursive: true });
     }
 }
 
@@ -128,8 +152,8 @@ function checkAndCopyDependencies() {
 
     depSet.forEach(depName => {
         const dependencyPath = path.join(NODE_MODULES_PATH, depName);
-        console.log("Copying '" + dependencyPath + "' to '" + OUTPUT_FOLDER_PATH + "node_modules/'")
-        fs.cpSync(dependencyPath, path.join(OUTPUT_FOLDER_PATH, "node_modules/" + depName), { recursive: true });
+        console.log("Copying '" + dependencyPath + "' to '" + getOutputFolder() + "node_modules/'")
+        fs.cpSync(dependencyPath, path.join(getOutputFolder(), "node_modules/" + depName), { recursive: true });
     })
 }
 

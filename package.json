@@ -2,5 +2,11 @@
   "name": "modules-export-script",
   "version": "1.0.0",
   "description": "The export script of modules.",
-  "author": "aarontburn"
+  "author": "aarontburn",
+  "dependencies": {
+    "dialog-node": "^0.2.1",
+    "file-dialog": "^0.0.8",
+    "node-file-dialog": "^1.0.3",
+    "use-file-picker": "^2.1.2"
+  }
 }
