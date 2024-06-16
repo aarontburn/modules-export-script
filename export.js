@@ -57,7 +57,7 @@ const getOutputFolder = () => chosenFolder === undefined ? OUTPUT_FOLDER_PATH : 
 async function main() {
 
     const outputPath = await getDirectory();
-    console.log(outputPath)
+    console.log("Outputting module to: " + outputPath)
     if (outputPath !== undefined) {
         chosenFolder = outputPath;
     }
@@ -73,11 +73,11 @@ async function main() {
 
 async function getDirectory() {
     const promise = new Promise((resolve, _) => {
-        dialogNode.fileselect('asd', 'Choose a folder to save your module in.', 0, (_, directory, __ ) => {
+        dialogNode.fileselect('', 'Choose a folder to save your module in.', 0, (_, directory, __ ) => {
             if (directory === '') {
                 resolve(undefined)
             }
-            resolve(directory)
+            resolve(`${directory.trim()}/${FOLDER_NAME}/`)
         });
     })
     return promise;
