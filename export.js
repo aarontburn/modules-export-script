@@ -20,11 +20,11 @@ Expected Result:
 
 
 
-
+const os = require('os');
 const path = require("path");
 const fs = require("fs");
 const dialogNode = require('dialog-node')
-const archiver = require('archiver')('zip');
+const archiver = require('archiver')(os.platform() !== 'linux' ? 'zip' : 'tar');
 
 // File name of the info file for the module.
 const MODULE_INFO_FILE = "moduleinfo.json";
@@ -50,6 +50,10 @@ const _OUTPUT_FOLDER_PATH = PWD + "/output/" + FOLDER_NAME + "/";
 
 // The path to the node_modules directory in the output folder.
 const NODE_MODULES_PATH = PWD + "/node_modules";
+
+
+
+
 
 let chosenFolder;
 
@@ -178,18 +182,18 @@ function checkDependencysDependencies(depName, depSet) {
 
 function toArchive() {
     const outputFolder = getOutputFolder();
-    const stream = fs.createWriteStream(outputFolder.slice(0, -1));
+    const stream = fs.createWriteStream(outputFolder.slice(0, -1) + '.zip');
     console.log("\n\tARCHIVING FOLDER")
-    console.log(`From ${outputFolder} to ${outputFolder.slice(0, -1)}`);
+    console.log(`From ${outputFolder} to ${outputFolder.slice(0, -1)}.zip`);
     return new Promise((resolve, reject) => {
-        archive
+        archiver
           .directory(outputFolder, false)
           .on('error', err => reject(err))
           .pipe(stream)
         ;
     
         stream.on('close', () => resolve());
-        archive.finalize();
+        archiver.finalize();
       });
 
 
