@@ -73,6 +73,7 @@ async function main() {
     copyFiles();
     checkAndCopyDependencies();
     await toArchive();
+    fs.rmSync(getOutputFolder(), { recursive: true, force: true });
 
     console.log("\n\tFINISHING BUNDLING MODULE");
 }
