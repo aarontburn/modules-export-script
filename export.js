@@ -24,6 +24,7 @@ Expected Result:
 const path = require("path");
 const fs = require("fs");
 const dialogNode = require('dialog-node')
+const archiver = require('archiver')('zip');
 
 // File name of the info file for the module.
 const MODULE_INFO_FILE = "moduleinfo.json";
@@ -45,14 +46,14 @@ if (FOLDER_NAME === undefined) {
 }
 
 // The path of the output directory in the output folder
-const OUTPUT_FOLDER_PATH = PWD + "/output/" + FOLDER_NAME + "/";
+const _OUTPUT_FOLDER_PATH = PWD + "/output/" + FOLDER_NAME + "/";
 
 // The path to the node_modules directory in the output folder.
 const NODE_MODULES_PATH = PWD + "/node_modules";
 
 let chosenFolder;
 
-const getOutputFolder = () => chosenFolder === undefined ? OUTPUT_FOLDER_PATH : chosenFolder;
+const getOutputFolder = () => chosenFolder === undefined ? _OUTPUT_FOLDER_PATH : chosenFolder;
 
 async function main() {
 
@@ -67,6 +68,7 @@ async function main() {
     createDirectories();
     copyFiles();
     checkAndCopyDependencies();
+    await toArchive();
 
     console.log("\n\tFINISHING BUNDLING MODULE");
 }
@@ -75,9 +77,9 @@ async function getDirectory() {
     const promise = new Promise((resolve, _) => {
         dialogNode.fileselect('', 'Choose a folder to save your module in.', 0, (_, directory, __ ) => {
             if (directory === '') {
-                resolve(undefined)
+                resolve(undefined);
             }
-            resolve(`${directory.trim()}/${FOLDER_NAME}/`)
+            resolve(`${directory.trim()}/${FOLDER_NAME}/`);
         });
     })
     return promise;
@@ -172,6 +174,25 @@ function checkDependencysDependencies(depName, depSet) {
             checkDependencysDependencies(name, depSet)
         })
     }
+}
+
+function toArchive() {
+    const outputFolder = getOutputFolder();
+    const stream = fs.createWriteStream(outputFolder.slice(0, -1));
+    console.log("\n\tARCHIVING FOLDER")
+    console.log(`From ${outputFolder} to ${outputFolder.slice(0, -1)}`);
+    return new Promise((resolve, reject) => {
+        archive
+          .directory(outputFolder, false)
+          .on('error', err => reject(err))
+          .pipe(stream)
+        ;
+    
+        stream.on('close', () => resolve());
+        archive.finalize();
+      });
+
+
 }
 
 

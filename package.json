@@ -4,6 +4,7 @@
   "description": "The export script of modules.",
   "author": "aarontburn",
   "dependencies": {
+    "archiver": "^7.0.1",
     "dialog-node": "^0.2.1"
   }
 }
