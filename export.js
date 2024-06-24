@@ -17,14 +17,12 @@ Expected Result:
     In the root directory, a directory 'output/' will be created containing required files for the module.
 */
 
-
-
-
 const os = require('os');
 const path = require("path");
 const fs = require("fs");
 const dialogNode = require('dialog-node')
 const archiver = require('archiver')(os.platform() !== 'linux' ? 'zip' : 'tar');
+
 
 // File name of the info file for the module.
 const MODULE_INFO_FILE = "moduleinfo.json";
@@ -51,21 +49,30 @@ const _OUTPUT_FOLDER_PATH = PWD + "/output/" + FOLDER_NAME + "/";
 // The path to the node_modules directory in the output folder.
 const NODE_MODULES_PATH = PWD + "/node_modules";
 
+const inDev = process.argv.includes('--dev');
 
 
 
 
 let chosenFolder;
 
-const getOutputFolder = () => chosenFolder === undefined ? _OUTPUT_FOLDER_PATH : chosenFolder;
+const getOutputFolder = () => {
+    if (inDev) {
+        return `${os.homedir()}/.modules_dev/external_modules/${FOLDER_NAME}/`;
+    }
+
+    return chosenFolder === undefined ? _OUTPUT_FOLDER_PATH : chosenFolder
+};
 
 async function main() {
-
-    const outputPath = await getDirectory();
-    console.log("Outputting module to: " + outputPath)
-    if (outputPath !== undefined) {
-        chosenFolder = outputPath;
+    if (!inDev) {
+        const outputPath = await getDirectory();
+        console.log("Outputting module to: " + outputPath)
+        if (outputPath !== undefined) {
+            chosenFolder = outputPath;
+        }
     }
+
 
     fs.rmSync(getOutputFolder(), { recursive: true, force: true });
     modifyModuleInfoJSON();
@@ -80,7 +87,7 @@ async function main() {
 
 async function getDirectory() {
     const promise = new Promise((resolve, _) => {
-        dialogNode.fileselect('', 'Choose a folder to save your module in.', 0, (_, directory, __ ) => {
+        dialogNode.fileselect('', 'Choose a folder to save your module in.', 0, (_, directory, __) => {
             if (directory === '') {
                 resolve(undefined);
             }
@@ -89,7 +96,7 @@ async function getDirectory() {
     })
     return promise;
 
-} 
+}
 
 function modifyModuleInfoJSON() {
     const jsonPath = PWD + "/src/" + FOLDER_NAME + "/" + MODULE_INFO_FILE;
@@ -142,7 +149,7 @@ function checkAndCopyDependencies() {
 
     for (const dependencyName of dependencyNames) {
         if (dependencyName === "modules-export-script") {
-            continue
+            continue;
         }
 
         if (!nodeModules.includes(dependencyName)) {
@@ -188,14 +195,14 @@ function toArchive() {
     console.log(`From ${outputFolder} to ${outputFolder.slice(0, -1)}.zip`);
     return new Promise((resolve, reject) => {
         archiver
-          .directory(outputFolder, false)
-          .on('error', err => reject(err))
-          .pipe(stream)
-        ;
-    
+            .directory(outputFolder, false)
+            .on('error', err => reject(err))
+            .pipe(stream)
+            ;
+
         stream.on('close', () => resolve());
         archiver.finalize();
-      });
+    });
 
 
 }
