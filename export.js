@@ -137,6 +137,11 @@ function checkAndCopyDependencies() {
 
     const dependencies = json["dependencies"];
 
+    if (!dependencies) {
+        return;
+    }
+
+
     const dependencyNames = Object.keys(dependencies);
     if (dependencyNames.length > 1) {
         console.log("\n\tBUNDLING DEPENDENCIES\n");
