@@ -99,10 +99,13 @@ async function getDirectory() {
 }
 
 function modifyModuleInfoJSON() {
+    if (inDev) {
+        return;
+    }
     const jsonPath = PWD + "/src/" + FOLDER_NAME + "/" + MODULE_INFO_FILE;
     const json = JSON.parse(fs.readFileSync(jsonPath));
     json["build_version"] += 1
-    fs.writeFileSync(jsonPath, JSON.stringify(json));
+    fs.writeFileSync(jsonPath, JSON.stringify(json, undefined, 4));
 }
 
 function createDirectories() {
