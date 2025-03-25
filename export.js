@@ -71,7 +71,6 @@ const [excludedDirectories, addToBuild] = (() => {
         ];
     }
 })();
-console.log(excludedDirectories, addToBuild)
 
 // The path of the output directory in the output folder
 const _OUTPUT_FOLDER_PATH = PWD + "/output/" + FOLDER_NAME + "/";
