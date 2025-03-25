@@ -80,8 +80,8 @@ const NODE_MODULES_PATH = PWD + "/node_modules";
 
 const inDev = process.argv.includes('--dev');
 if (!process.argv.includes("--verbose")) {
-    // Mute all console.debug
-    console.debug = function (message) {
+    // Mute all console.log
+    console.log = function (message) {
         // original.apply(console, arguments);
     }
 }
@@ -148,23 +148,23 @@ function createDirectories() {
         fs.mkdirSync(directoryName, { recursive: true })
     }
 
-    console.debug("\n\tCREATING FOLDERS\n");
+    console.log("\n\tCREATING FOLDERS\n");
     mkdir(getOutputFolder());
     mkdir(getOutputFolder() + "module_builder");
     mkdir(getOutputFolder() + "node_modules");
 }
 
 function copyFiles() {
-    console.debug("\n\tCOPYING FILES\n");
+    console.log("\n\tCOPYING FILES\n");
 
     const dir = PWD + "/src/" + FOLDER_NAME + "/";
     for (const file of fs.readdirSync(dir, { withFileTypes: true })) {
         if (excludedDirectories.includes(file.name)) {
-            console.debug("Excluding " + file.name)
+            console.log("Excluding " + file.name)
             continue;
         }
 
-        console.debug(`Copying '${path.join(file.path, file.name)}' to output folder (${path.join(getOutputFolder(), file.name)})`);
+        console.log(`Copying '${path.join(file.path, file.name)}' to output folder (${path.join(getOutputFolder(), file.name)})`);
         fs.cpSync(path.join(file.path, file.name), path.join(getOutputFolder(), file.name), { recursive: true });
     }
 
@@ -212,7 +212,7 @@ function checkAndCopyDependencies() {
 
     depSet.forEach(depName => {
         const dependencyPath = path.join(NODE_MODULES_PATH, depName);
-        console.debug("Copying '" + dependencyPath + "' to '" + getOutputFolder() + "node_modules/'")
+        console.log("Copying '" + dependencyPath + "' to '" + getOutputFolder() + "node_modules/'")
         fs.cpSync(dependencyPath, path.join(getOutputFolder(), "node_modules/" + depName), { recursive: true });
     })
 }
@@ -237,8 +237,8 @@ function checkDependencysDependencies(depName, depSet) {
 function toArchive() {
     const outputFolder = getOutputFolder();
     const stream = fs.createWriteStream(outputFolder.slice(0, -1) + '.zip');
-    console.debug("\n\tARCHIVING FOLDER")
-    console.debug(`From ${outputFolder} to ${outputFolder.slice(0, -1)}.zip`);
+    console.log("\n\tARCHIVING FOLDER")
+    console.log(`From ${outputFolder} to ${outputFolder.slice(0, -1)}.zip`);
     return new Promise((resolve, reject) => {
         archiver
             .directory(outputFolder, false)
