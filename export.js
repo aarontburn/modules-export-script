@@ -79,7 +79,7 @@ const _OUTPUT_FOLDER_PATH = PWD + "/output/" + FOLDER_NAME + "/";
 const NODE_MODULES_PATH = PWD + "/node_modules";
 
 const inDev = process.argv.includes('--dev');
-if (process.argv.includes("--verbose")) {
+if (!process.argv.includes("--verbose")) {
     // Mute all console.debug
     console.debug = function (message) {
         // original.apply(console, arguments);
