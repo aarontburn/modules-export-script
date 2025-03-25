@@ -49,6 +49,30 @@ if (FOLDER_NAME === undefined) {
     throw new Error(`Could not locate '${MODULE_INFO_FILE}'. Ensure your module folder contains it.`);
 }
 
+
+const DEFAULT_EXCLUDED = [
+    "module_builder",
+    "export-config.js"
+]
+
+
+const EXPORT_CONFIG_FILE = "export-config.js"
+const [excludedDirectories, addToBuild] = (() => {
+    try {
+        const obj = require(`${PWD}src/${FOLDER_NAME}/${EXPORT_CONFIG_FILE}`);
+        return [
+            [...DEFAULT_EXCLUDED, ...obj["excluded"] ?? []],
+            obj["included"] ?? []
+        ];
+    } catch {
+        return [
+            [...DEFAULT_EXCLUDED],
+            []
+        ];
+    }
+})();
+console.log(excludedDirectories, addToBuild)
+
 // The path of the output directory in the output folder
 const _OUTPUT_FOLDER_PATH = PWD + "/output/" + FOLDER_NAME + "/";
 
@@ -130,7 +154,8 @@ function copyFiles() {
 
     const dir = PWD + "/src/" + FOLDER_NAME + "/";
     for (const file of fs.readdirSync(dir, { withFileTypes: true })) {
-        if (file.isDirectory() && file.name === "module_builder") {
+        if (excludedDirectories.includes(file.name)) {
+            console.log("Excluding " + file.name)
             continue;
         }
 
