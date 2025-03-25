@@ -27,8 +27,14 @@ const archiver = require('archiver')(os.platform() !== 'linux' ? 'zip' : 'tar');
 // File name of the info file for the module.
 const MODULE_INFO_FILE = "moduleinfo.json";
 
+
+
+
 // The path of the root directory of this module.
 const PWD = path.join(__dirname, "../", "../");
+
+
+
 
 const FOLDER_NAME = (() => {
     const srcPath = path.join(PWD, "src");
@@ -130,6 +136,10 @@ function copyFiles() {
 
         console.log(`Copying '${path.join(file.path, file.name)}' to output folder (${path.join(getOutputFolder(), file.name)})`);
         fs.cpSync(path.join(file.path, file.name), path.join(getOutputFolder(), file.name), { recursive: true });
+    }
+
+    for (const file of addToBuild) {
+        fs.cpSync(path.join(dir, file), path.join(getOutputFolder(), file.split("/").at(-1)), { recursive: true });
     }
 }
 
