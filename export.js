@@ -167,7 +167,11 @@ function copyFiles() {
     }
 
     for (const file of addToBuild) {
-        fs.cpSync(path.join(dir, file), path.join(getOutputFolder(), file.split("/").at(-1)), { recursive: true });
+        try {
+            fs.cpSync(path.join(dir, file), path.join(getOutputFolder(), file.split("/").at(-1)), { recursive: true });
+        } catch (err) {
+            console.err(err)
+        }
     }
 }
 
