@@ -170,7 +170,7 @@ function copyFiles() {
         try {
             fs.cpSync(path.join(dir, file), path.join(getOutputFolder(), file.split("/").at(-1)), { recursive: true });
         } catch (err) {
-            console.err(err)
+            console.error(err)
         }
     }
 }
