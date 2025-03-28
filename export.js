@@ -51,7 +51,6 @@ if (FOLDER_NAME === undefined) {
 
 
 const DEFAULT_EXCLUDED = [
-    "module_builder",
     "export-config.js"
 ]
 
@@ -150,7 +149,6 @@ function createDirectories() {
 
     console.log("\n\tCREATING FOLDERS\n");
     mkdir(getOutputFolder());
-    mkdir(getOutputFolder() + "module_builder");
     mkdir(getOutputFolder() + "node_modules");
 }
 
@@ -200,6 +198,11 @@ function checkAndCopyDependencies() {
             continue;
         }
 
+        if (dependencyName === "module_builder") {
+            fs.cpSync(path.join(NODE_MODULES_PATH, dependencyName, "dist"), path.join(getOutputFolder(), "node_modules/" + dependencyName), { recursive: true });
+            continue
+        }
+
         if (!nodeModules.includes(dependencyName)) {
             console.log(dependencyName + " was not found in 'node_modules'. Skipping...")
             continue;
@@ -208,6 +211,7 @@ function checkAndCopyDependencies() {
         depSet.add(dependencyName)
         checkDependencysDependencies(dependencyName, depSet)
     }
+
 
 
     depSet.forEach(depName => {
